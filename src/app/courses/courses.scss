@@ -1,9 +1,7 @@
-mat-card {
-  margin: 20px;
+table {
+  width: 100%; // Faz a tabela ocupar todo o espaço do card
 }
 
-mat-toolbar {
-  background-color: var(--mat-sys-primary) !important;
-  color: var(--mat-sys-on-primary) !important;
-  margin-bottom: 10px;
+.mat-mdc-table { // Seletor específico do Material 3 para garantir o estilo
+  background: transparent;
 }
