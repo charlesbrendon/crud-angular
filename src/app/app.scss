@@ -1,0 +1,5 @@
+mat-toolbar {
+  // Isso força o componente a usar a cor de fundo primária definida no seu styles.scss
+  background-color: var(--mat-sys-primary) !important;
+  color: var(--mat-sys-on-primary) !important;
+}
