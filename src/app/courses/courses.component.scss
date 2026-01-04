@@ -11,3 +11,11 @@ table {
   font-weight: bold;
   color: #1E1E1E; /* Texto preto para os títulos das colunas */
 }
+
+.loading-spinner {
+  padding: 25px; // Espaçamento interno
+  display: flex; // Habilita o Flexbox para centralizar
+  align-items: center; // Centraliza verticalmente
+  justify-content: center; // Centraliza horizontalmente
+  background: rgba(0, 0, 0, 0.03); // Fundo sutil para o carregamento
+}

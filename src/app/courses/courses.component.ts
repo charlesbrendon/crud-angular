@@ -6,13 +6,14 @@ import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { CommonModule } from '@angular/common'; // Necessário para usar o pipe async no HTML
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-courses',
   standalone: true,
-  imports: [MatTableModule, MatCardModule, MatToolbarModule, CommonModule],
-  templateUrl: './courses.html',
-  styleUrl: './courses.scss'
+  imports: [MatTableModule, MatCardModule, MatToolbarModule, MatProgressSpinnerModule, CommonModule],
+  templateUrl: './courses.component.html',
+  styleUrl: './courses.component.scss'
 })
 export class CoursesComponent {
 
