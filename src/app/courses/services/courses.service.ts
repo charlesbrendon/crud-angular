@@ -1,21 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http'; // Importe o HttpClient
 import { Course } from '../model/course';
-import { delay, first, of, tap } from 'rxjs'; // Bibliotecas RxJS necessárias
+import { delay, first, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CoursesService {
-
-  constructor() { }
+  private readonly http = inject(HttpClient);
+  // Caminho correto para quem criou public/assets/courses.json
+  private readonly API = 'assets/courses.json';
 
   list() {
-    return of<Course[]>([
-      { _id: '1', name: 'Angular', category: 'front-end' }
-    ]).pipe(
-      first(), // Pega a primeira resposta e fecha a conexão
-      delay(1000), // Simula um atraso de 1 segundo de rede para testarmos o Spinner depois
-      tap(courses => console.log(courses)) // Log para debug no terminal do navegador
+    return this.http.get<Course[]>(this.API)
+      .pipe(
+        first(),
+        delay(1000),
+        tap(courses => console.log('Dados recebidos:', courses))
     );
   }
 }
