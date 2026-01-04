@@ -1,7 +1,13 @@
-table {
-  width: 100%; // Faz a tabela ocupar todo o espaço do card
+mat-card {
+  margin: 20px; /* Adiciona o respiro ao redor do card */
+  border-radius: 4px; /* Opcional: arredondamento clássico do Material 2 */
 }
 
-.mat-mdc-table { // Seletor específico do Material 3 para garantir o estilo
-  background: transparent;
+table {
+  width: 100%; /* Garante que a tabela use o espaço do card */
+}
+
+.mat-mdc-header-cell {
+  font-weight: bold;
+  color: #1E1E1E; /* Texto preto para os títulos das colunas */
 }

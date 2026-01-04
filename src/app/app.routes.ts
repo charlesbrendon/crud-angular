@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { CoursesComponent } from './courses/courses';
+import { CoursesComponent } from './courses/courses.component';
 
 export const routes: Routes = [
   // Quando abrir o site, ele redireciona automaticamente para /courses
