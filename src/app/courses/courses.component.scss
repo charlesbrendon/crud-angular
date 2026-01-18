@@ -1,21 +1,228 @@
+:host {
+  display: block;
+  padding: 20px;
+}
+
 mat-card {
-  margin: 20px; /* Adiciona o respiro ao redor do card */
-  border-radius: 4px; /* Opcional: arredondamento clássico do Material 2 */
+  margin: 0 auto;
+  max-width: 1000px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+}
+
+// ESTADO DE ERRO
+.error-container {
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin: 30px 0;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
+  border-radius: 12px;
+  border: 1px solid #fecaca;
+  text-align: center;
+
+  mat-icon {
+    color: #dc2626;
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .error-text {
+    color: #7f1d1d;
+    font-weight: 500;
+    font-size: 16px;
+    margin: 0;
+    line-height: 1.5;
+    max-width: 500px;
+  }
+
+  .action-button {
+    min-width: 180px;
+    height: 44px;
+    font-weight: 500;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      color: inherit;
+    }
+  }
+}
+
+// ESTADO DE CARREGAMENTO
+.loading-spinner {
+  padding: 60px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+
+  .loading-text {
+    color: rgba(0, 0, 0, 0.87);
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .loading-subtext {
+    color: rgba(0, 0, 0, 0.54);
+    margin: 0;
+    font-size: 14px;
+    font-style: italic;
+  }
+}
+
+// TABELA
+.table-container {
+  overflow-x: auto;
+  margin-top: 24px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
 }
 
 table {
-  width: 100%; /* Garante que a tabela use o espaço do card */
+  width: 100%;
+  min-width: 600px;
+
+  .mat-mdc-header-cell {
+    font-weight: 600;
+    font-size: 14px;
+    color: #374151;
+    background-color: #f9fafb;
+    padding: 16px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .mat-mdc-cell {
+    padding: 16px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.87);
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  tr.mat-mdc-row:hover {
+    background-color: #f8fafc;
+  }
+
+  .no-data-row {
+    td {
+      text-align: center;
+      padding: 40px;
+      color: rgba(0, 0, 0, 0.54);
+      font-style: italic;
+    }
+  }
 }
 
-.mat-mdc-header-cell {
-  font-weight: bold;
-  color: #1E1E1E; /* Texto preto para os títulos das colunas */
+// ESTADO VAZIO
+.empty-state {
+  padding: 60px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  margin: 30px 0;
+
+  .empty-icon {
+    font-size: 64px;
+    height: 64px;
+    width: 64px;
+    color: #64748b;
+    opacity: 0.6;
+  }
+
+  .empty-text {
+    h3 {
+      margin: 0 0 8px 0;
+      color: #1e293b;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: #64748b;
+      font-size: 16px;
+      max-width: 400px;
+      line-height: 1.5;
+    }
+  }
+
+  .action-button {
+    min-width: 160px;
+    height: 44px;
+    font-weight: 500;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
 }
 
-.loading-spinner {
-  padding: 25px; // Espaçamento interno
-  display: flex; // Habilita o Flexbox para centralizar
-  align-items: center; // Centraliza verticalmente
-  justify-content: center; // Centraliza horizontalmente
-  background: rgba(0, 0, 0, 0.03); // Fundo sutil para o carregamento
+// ANIMAÇÕES
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+mat-card-content > * {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// RESPONSIVIDADE
+@media (max-width: 768px) {
+  :host {
+    padding: 12px;
+  }
+
+  mat-card {
+    border-radius: 8px;
+  }
+
+  .error-container,
+  .empty-state {
+    padding: 32px 16px;
+    margin: 20px 0;
+    border-radius: 8px;
+  }
+
+  .error-text,
+  .empty-text h3 {
+    font-size: 16px;
+  }
+
+  .empty-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+  }
+
+  table {
+    min-width: 100%;
+
+    .mat-mdc-header-cell,
+    .mat-mdc-cell {
+      padding: 12px 8px;
+    }
+  }
 }
