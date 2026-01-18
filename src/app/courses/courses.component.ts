@@ -13,6 +13,7 @@ import { delay, takeUntil } from 'rxjs/operators';
 
 import { Course } from './model/course';
 import { CoursesService } from './services/courses.service';
+import { CategoryPipe } from '../shared/pipes/category-pipe'; // 👈 Importe o pipe
 
 @Component({
   selector: 'app-courses',
@@ -25,7 +26,8 @@ import { CoursesService } from './services/courses.service';
     MatProgressSpinnerModule,
     MatIconModule,
     MatButtonModule,
-    MatTooltipModule
+    MatTooltipModule,
+    CategoryPipe, // 👈 Adicione ao array de imports
   ],
   templateUrl: './courses.component.html',
   styleUrl: './courses.component.scss'
@@ -36,7 +38,6 @@ export class CoursesComponent implements OnInit, OnDestroy {
 
   displayedColumns = ['name', 'category'];
 
-  // States
   courses = signal<Course[]>([]);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
@@ -52,7 +53,7 @@ export class CoursesComponent implements OnInit, OnDestroy {
 
     this.coursesService.list()
       .pipe(
-        delay(1500), // Tempo otimizado para melhor UX
+        delay(1000), // Reduzido para melhor UX
         takeUntil(this.destroy$)
       )
       .subscribe({

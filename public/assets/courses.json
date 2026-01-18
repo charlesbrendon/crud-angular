@@ -1,4 +1,32 @@
 [
-  { "_id": "1", "name": "Angular", "category": "front-end" },
-  { "_id": "2", "name": "Spring", "category": "back-end" }
+  {
+    "_id": "1",
+    "name": "Angular 19 Avançado",
+    "category": "front-end"
+  },
+  {
+    "_id": "2",
+    "name": "Spring Boot & Microservices",
+    "category": "back-end"
+  },
+  {
+    "_id": "3",
+    "name": "React Native com TypeScript",
+    "category": "mobile"
+  },
+  {
+    "_id": "4",
+    "name": "Docker & Kubernetes",
+    "category": "devops"
+  },
+  {
+    "_id": "5",
+    "name": "Python para Data Science",
+    "category": "data-science"
+  },
+  {
+    "_id": "6",
+    "name": "UI/UX Design com Figma",
+    "category": "design"
+  }
 ]

@@ -15,6 +15,142 @@ mat-card {
   }
 }
 
+// ESTILOS ESPECÍFICOS PARA A TABELA COM ÍCONES
+.table-container {
+  overflow-x: auto;
+  margin-top: 24px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+table {
+  width: 100%;
+  min-width: 600px;
+
+  .mat-mdc-header-cell {
+    font-weight: 600;
+    font-size: 14px;
+    color: #374151;
+    background-color: #f9fafb;
+    padding: 16px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .mat-mdc-cell {
+    padding: 16px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.87);
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+  }
+
+  tr.mat-mdc-row:hover {
+    background-color: #f8fafc;
+  }
+}
+
+// Estilo para célula de categoria com ícone
+.category-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  mat-icon {
+    color: #1976d2;
+    background-color: #e3f2fd;
+    border-radius: 50%;
+    padding: 8px;
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // Cores diferentes para diferentes categorias
+    &[fontIcon="code"] {
+      color: #0288d1;
+      background-color: #e1f5fe;
+    }
+
+    &[fontIcon="storage"] {
+      color: #7b1fa2;
+      background-color: #f3e5f5;
+    }
+
+    &[fontIcon="dns"] {
+      color: #388e3c;
+      background-color: #e8f5e9;
+    }
+
+    &[fontIcon="devices"] {
+      color: #f57c00;
+      background-color: #fff3e0;
+    }
+  }
+
+  .category-text {
+    font-weight: 500;
+    color: #374151;
+    text-transform: capitalize;
+  }
+}
+
+// Estilo para nome do curso
+.course-name {
+  font-weight: 500;
+  color: #1a237e;
+}
+
+// Estilo para estado vazio
+.empty-state {
+  padding: 60px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  margin: 30px 0;
+
+  .empty-icon {
+    font-size: 64px;
+    height: 64px;
+    width: 64px;
+    color: #64748b;
+    opacity: 0.6;
+  }
+
+  .empty-text {
+    h3 {
+      margin: 0 0 8px 0;
+      color: #1e293b;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: #64748b;
+      font-size: 16px;
+      max-width: 400px;
+      line-height: 1.5;
+    }
+  }
+
+  .action-button {
+    min-width: 160px;
+    height: 44px;
+    font-weight: 500;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+
 // ESTADO DE ERRO
 .error-container {
   padding: 40px 24px;
