@@ -1,4 +1,5 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router'; // 1. Importe Router e ActivatedRoute
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
@@ -35,6 +36,8 @@ import { CategoryPipe } from '../shared/pipes/category-pipe'; // 👈 Importe o 
 export class CoursesComponent implements OnInit, OnDestroy {
   private coursesService = inject(CoursesService);
   private destroy$ = new Subject<void>();
+  private router = inject(Router); // 2. Injete o Roteador
+  private route = inject(ActivatedRoute); // 2. Injete a Rota Atual
 
   displayedColumns = ['name', 'category'];
 
@@ -90,5 +93,10 @@ export class CoursesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  onAdd() {
+    console.log('Navegando para criação de curso...');
+    this.router.navigate(['new'], { relativeTo: this.route });
   }
 }
