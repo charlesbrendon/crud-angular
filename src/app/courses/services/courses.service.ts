@@ -7,7 +7,7 @@ import { Course } from '../model/course';
   providedIn: 'root'
 })
 export class CoursesService {
-  private readonly API = 'api/courses'; // Aponte para o JSON correto
+  private readonly API = 'api/courses';
 
   constructor(private httpClient: HttpClient) { }
 
@@ -17,5 +17,11 @@ export class CoursesService {
         first(),
         tap(courses => console.log(courses))
       );
+  }
+
+  // Novo método para persistir dados
+  save(record: Partial<Course>) {
+    return this.httpClient.post<Course>(this.API, record)
+      .pipe(first());
   }
 }
