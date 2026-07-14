@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Location } from '@angular/common'; // Importação para usar histórico de navegação
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Location, CommonModule } from '@angular/common'; // Importação para usar histórico de navegação
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,6 +15,7 @@ import { CoursesService } from '../services/courses.service';
   selector: 'app-course-form',
   standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -37,26 +38,34 @@ export class CourseForm {
   form: FormGroup;
 
   constructor() {
+// 2. Adicione validações aos campos
     this.form = this.formBuilder.group({
-      name: [null],
-      category: [null]
+      name: [null, [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+      category: [null, [Validators.required]]
     });
   }
 
   onSubmit() {
-    this.coursesService.save(this.form.value)
-      .subscribe({
-        next: (result) => {
-          this.snackBar.open('Curso salvo com sucesso!', '', { duration: 5000 });
-          this.onCancel(); // Retorna para a listagem após salvar
-        },
-        error: () => {
-          this.snackBar.open('Erro ao salvar curso.', '', { duration: 5000 });
-        }
-      });
+    if (this.form.valid) {
+      this.coursesService.save(this.form.value)
+        .subscribe({
+          next: (result) => {
+            this.snackBar.open('Curso salvo com sucesso!', '', { duration: 5000 });
+            this.onCancel();
+          },
+          error: () => this.onError()
+        });
+    }
   }
 
   onCancel() {
     this.location.back(); // Volta para a tela de listagem (/courses)
   }
+
+
+// Tratamento de erro isolado como boa prática
+  private onError() {
+    this.snackBar.open('Erro ao salvar curso.', '', { duration: 5000 });
+  }
 }
+
