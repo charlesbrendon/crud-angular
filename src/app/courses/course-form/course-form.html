@@ -3,34 +3,47 @@
 
   <mat-card-content>
     <form [formGroup]="form" class="min-width">
+      <fieldset [disabled]="isSaving()" style="border: none; padding: 0; margin: 0;">
 
-      <mat-form-field class="full-width">
-        <mat-label>Nome</mat-label>
-        <input matInput placeholder="Ex: Angular Avançado" formControlName="name">
-        @if (form.get('name')?.hasError('required')) {
-          <mat-error>O nome do curso é obrigatório.</mat-error>
-        }
-        @if (form.get('name')?.hasError('minlength')) {
-          <mat-error>O nome precisa ter pelo menos 5 caracteres.</mat-error>
-        }
-      </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Nome</mat-label>
+          <input matInput placeholder="Ex: Angular Avançado" formControlName="name">
+          @if (form.get('name')?.hasError('required')) {
+            <mat-error>O nome do curso é obrigatório.</mat-error>
+          }
+          @if (form.get('name')?.hasError('minlength')) {
+            <mat-error>O nome precisa ter pelo menos 5 caracteres.</mat-error>
+          }
+        </mat-form-field>
 
-      <mat-form-field class="full-width">
-        <mat-label>Categoria</mat-label>
-        <mat-select formControlName="category">
-          <mat-option value="front-end">Front-end</mat-option>
-          <mat-option value="back-end">Back-end</mat-option>
-        </mat-select>
-        @if (form.get('category')?.hasError('required')) {
-          <mat-error>Selecione uma categoria.</mat-error>
-        }
-      </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Categoria</mat-label>
+          <mat-select formControlName="category">
+            <mat-option value="front-end">Front-end</mat-option>
+            <mat-option value="back-end">Back-end</mat-option>
+          </mat-select>
+          @if (form.get('category')?.hasError('required')) {
+            <mat-error>Selecione uma categoria.</mat-error>
+          }
+        </mat-form-field>
 
+      </fieldset>
     </form>
   </mat-card-content>
 
   <mat-card-actions>
-    <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="onSubmit()">Salvar</button>
-    <button mat-button (click)="onCancel()">Cancelar</button>
+    <button mat-raised-button
+            color="primary"
+            [disabled]="form.invalid || isSaving()"
+            (click)="onSubmit()"
+            style="min-width: 100px;">
+      @if (isSaving()) {
+        <mat-spinner diameter="20" color="accent" style="margin: 0 auto;"></mat-spinner>
+      } @else {
+        Salvar
+      }
+    </button>
+
+    <button mat-button [disabled]="isSaving()" (click)="onCancel()">Cancelar</button>
   </mat-card-actions>
 </mat-card>
