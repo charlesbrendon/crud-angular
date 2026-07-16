@@ -1,16 +1,18 @@
-import { Component, inject, signal } from '@angular/core'; //  Adicione o "signal"
+import { Component, inject, signal, OnInit } from '@angular/core'; // 1. Adicione o OnInit
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Location, CommonModule } from '@angular/common'; // Importação para usar histórico de navegação
+import { Location, CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // Importe para feedback visual
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; //  Importe o Progress Spinner
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ActivatedRoute } from '@angular/router'; // 2. Importe o ActivatedRoute
 
 import { CoursesService } from '../services/courses.service';
+import { Course } from '../model/course';
 
 @Component({
   selector: 'app-course-form',
@@ -24,35 +26,38 @@ import { CoursesService } from '../services/courses.service';
     MatToolbarModule,
     MatButtonModule,
     MatSelectModule,
-    MatSnackBarModule, // Adicionado para exibir mensagens
-    MatProgressSpinnerModule // Adicionado para exibir o spinner de carregamento (array de imports)
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './course-form.html',
   styleUrl: './course-form.scss'
 })
-export class CourseForm {
+export class CourseForm implements OnInit { // 3. Implemente o OnInit
 
   private formBuilder = inject(FormBuilder);
   private coursesService = inject(CoursesService);
   private snackBar = inject(MatSnackBar);
-  private location = inject(Location); // Substitui a necessidade de rotas complexas para voltar
+  private location = inject(Location);
+  private route = inject(ActivatedRoute); // 4. Injete a rota ativa
 
-  form: FormGroup;
-
-  // Crie o signal para controlar o estado de salvamento
+  form!: FormGroup; // Mudança para inicialização tardia com "!"
   isSaving = signal<boolean>(false);
 
-  constructor() {
-//  Adicione validações aos campos
+  ngOnInit(): void {
+    // 5. Captura o objeto "course" carregado pelo Resolver de Rotas
+    const course: Course = this.route.snapshot.data['course'];
+
+    // 6. Constrói o formulário inicializando com os dados existentes (caso seja edição)
     this.form = this.formBuilder.group({
-      name: [null, [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
-      category: [null, [Validators.required]]
+      id: [course?.id || ''], // 👈 MUITO IMPORTANTE: O ID fica mapeado aqui (invisível na tela)
+      name: [course?.name || '', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+      category: [course?.category || '', [Validators.required]]
     });
   }
 
   onSubmit() {
     if (this.form.valid) {
-      this.isSaving.set(true); //  Ative o modo "salvando..."
+      this.isSaving.set(true);
       this.coursesService.save(this.form.value)
         .subscribe({
           next: (result) => {
@@ -65,14 +70,11 @@ export class CourseForm {
   }
 
   onCancel() {
-    this.location.back(); // Volta para a tela de listagem (/courses)
+    this.location.back();
   }
 
-
-// Tratamento de erro isolado como boa prática
   private onError() {
-    this.isSaving.set(false); //  Desative em caso de erro para permitir tentar novamente
+    this.isSaving.set(false);
     this.snackBar.open('Erro ao salvar curso.', '', { duration: 5000 });
   }
 }
-

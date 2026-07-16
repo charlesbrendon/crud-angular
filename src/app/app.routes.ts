@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { CoursesComponent } from './courses/courses.component';
 import { CourseForm } from './courses/course-form/course-form';
+import { courseResolver } from './courses/guards/course-resolver';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'courses' },
@@ -8,9 +9,8 @@ export const routes: Routes = [
     path: 'courses',
     children: [
       { path: '', component: CoursesComponent },
-      { path: 'new', component: CourseForm },
-      // 👈 ADICIONE A ROTA DE EDIÇÃO BEM AQUI:
-      { path: 'edit/:id', component: CourseForm }
+      { path: 'new', component: CourseForm, resolve: { course: courseResolver } },  // 👈 Adicionado
+      { path: 'edit/:id', component: CourseForm, resolve: { course: courseResolver } } // 👈 Adicionado
     ]
   }
 ];

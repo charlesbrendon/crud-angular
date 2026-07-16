@@ -19,15 +19,25 @@ export class CoursesService {
       );
   }
 
-  // 👈 NOVO MÉTODO: Busca por ID
   loadById(id: string) {
     return this.httpClient.get<Course>(`${this.API}/${id}`)
       .pipe(first());
   }
 
-  // Novo método para persistir dados
+  // 1. Atualize o método save para ramificar entre criação e edição
   save(record: Partial<Course>) {
-    return this.httpClient.post<Course>(this.API, record)
-      .pipe(first());
+    if (record.id) {
+      return this.update(record);
+    }
+    return this.create(record);
+  }
+
+  private create(record: Partial<Course>) {
+    return this.httpClient.post<Course>(this.API, record).pipe(first());
+  }
+
+  private update(record: Partial<Course>) {
+    // Envia um PUT para "api/courses/{id}" com as alterações
+    return this.httpClient.put<Course>(`${this.API}/${record.id}`, record).pipe(first());
   }
 }
