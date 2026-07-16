@@ -43,6 +43,28 @@ export class CourseForm implements OnInit { // 3. Implemente o OnInit
   form!: FormGroup; // Mudança para inicialização tardia com "!"
   isSaving = signal<boolean>(false);
 
+  // Retorna a mensagem de erro apropriada para cada campo do formulário
+  getErrorMessage(fieldName: string): string {
+    const field = this.form.get(fieldName);
+
+    if (field?.hasError('required')) {
+      return 'Campo obrigatório';
+    }
+
+    if (field?.hasError('minlength')) {
+      // Busca o tamanho mínimo exigido dinamicamente das configurações do validador
+      const requiredLength = field.errors ? field.errors['minlength']['requiredLength'] : 5;
+      return `Tamanho mínimo precisa ser de ${requiredLength} caracteres.`;
+    }
+
+    if (field?.hasError('maxlength')) {
+      const requiredLength = field.errors ? field.errors['maxlength']['requiredLength'] : 100;
+      return `Tamanho máximo excedido de ${requiredLength} caracteres.`;
+    }
+
+    return 'Campo inválido';
+  }
+
   ngOnInit(): void {
     // 5. Captura o objeto "course" carregado pelo Resolver de Rotas
     const course: Course = this.route.snapshot.data['course'];

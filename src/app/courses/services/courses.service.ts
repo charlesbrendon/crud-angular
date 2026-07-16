@@ -40,4 +40,8 @@ export class CoursesService {
     // Envia um PUT para "api/courses/{id}" com as alterações
     return this.httpClient.put<Course>(`${this.API}/${record.id}`, record).pipe(first());
   }
+
+  remove(id: string) {
+    return this.httpClient.delete(`${this.API}/${id}`).pipe(first());
+  }
 }

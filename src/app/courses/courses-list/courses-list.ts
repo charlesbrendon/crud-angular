@@ -7,6 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { Course } from '../model/course';
 import { CategoryPipe } from '../../shared/pipes/category-pipe';
 
+
+
 @Component({
   selector: 'app-courses-list',
   standalone: true,
@@ -34,6 +36,9 @@ export class CoursesListComponent {
   // Adicione a saída para edição
   @Output() edit = new EventEmitter<Course>();
 
+  // Adicione a saída para remoção
+  @Output() remove = new EventEmitter<Course>();
+
   onAdd() {
     this.add.emit(true);
   }
@@ -41,5 +46,9 @@ export class CoursesListComponent {
   //  Adiciona o método para disparar o evento de edição
   onEdit(course: Course) {
     this.edit.emit(course);
+  }
+
+  onDelete(course: Course) {
+    this.remove.emit(course);
   }
 }

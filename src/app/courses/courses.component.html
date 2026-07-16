@@ -3,10 +3,10 @@
 
   @if (courses().length > 0) {
     <app-courses-list
-      [courses]="courses()"
-      (add)="onAdd()"
-      (edit)="onEdit($event)">
-    </app-courses-list>
+  [courses]="courses()"
+  (add)="onAdd()"
+  (edit)="onEdit($event)"
+  (remove)="onDelete($event)"> </app-courses-list>
   } @else if (isLoading()) {
     <div class="loading-spinner">
       <mat-spinner></mat-spinner>
