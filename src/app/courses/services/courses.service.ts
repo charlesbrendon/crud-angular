@@ -19,6 +19,12 @@ export class CoursesService {
       );
   }
 
+  // 👈 NOVO MÉTODO: Busca por ID
+  loadById(id: string) {
+    return this.httpClient.get<Course>(`${this.API}/${id}`)
+      .pipe(first());
+  }
+
   // Novo método para persistir dados
   save(record: Partial<Course>) {
     return this.httpClient.post<Course>(this.API, record)

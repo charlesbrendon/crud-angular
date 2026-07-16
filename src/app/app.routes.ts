@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { CoursesComponent } from './courses/courses.component';
-// 1. Ajuste o import: O nome da classe mudou para CourseForm e o arquivo não tem mais .component no nome
 import { CourseForm } from './courses/course-form/course-form';
 
 export const routes: Routes = [
@@ -9,8 +8,9 @@ export const routes: Routes = [
     path: 'courses',
     children: [
       { path: '', component: CoursesComponent },
-      // 2. Use a classe CourseForm aqui
-      { path: 'new', component: CourseForm }
+      { path: 'new', component: CourseForm },
+      // 👈 ADICIONE A ROTA DE EDIÇÃO BEM AQUI:
+      { path: 'edit/:id', component: CourseForm }
     ]
   }
 ];

@@ -1,34 +1,28 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router'; // 1. Importe Router e ActivatedRoute
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { Subject } from 'rxjs';
 import { delay, takeUntil } from 'rxjs/operators';
 
 import { Course } from './model/course';
 import { CoursesService } from './services/courses.service';
-import { CategoryPipe } from '../shared/pipes/category-pipe'; // 👈 Importe o pipe
+import { CoursesListComponent } from './courses-list/courses-list'; // 👈 Importado aqui
 
 @Component({
   selector: 'app-courses',
   standalone: true,
   imports: [
     CommonModule,
-    MatTableModule,
     MatCardModule,
     MatToolbarModule,
     MatProgressSpinnerModule,
-    MatIconModule,
     MatButtonModule,
-    MatTooltipModule,
-    CategoryPipe, // 👈 Adicione ao array de imports
+    CoursesListComponent // 👈 Adicionado aqui
   ],
   templateUrl: './courses.component.html',
   styleUrl: './courses.component.scss'
@@ -36,10 +30,8 @@ import { CategoryPipe } from '../shared/pipes/category-pipe'; // 👈 Importe o 
 export class CoursesComponent implements OnInit, OnDestroy {
   private coursesService = inject(CoursesService);
   private destroy$ = new Subject<void>();
-  private router = inject(Router); // 2. Injete o Roteador
-  private route = inject(ActivatedRoute); // 2. Injete a Rota Atual
-
-  displayedColumns = ['name', 'category'];
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   courses = signal<Course[]>([]);
   isLoading = signal<boolean>(false);
@@ -56,7 +48,7 @@ export class CoursesComponent implements OnInit, OnDestroy {
 
     this.coursesService.list()
       .pipe(
-        delay(1000), // Reduzido para melhor UX
+        delay(1000),
         takeUntil(this.destroy$)
       )
       .subscribe({
@@ -66,19 +58,7 @@ export class CoursesComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Erro:', error);
-
-          let errorMsg = 'Erro ao carregar cursos.';
-          if (error.status === 0) {
-            errorMsg = 'Erro de conexão. Verifique sua internet.';
-          } else if (error.status === 404) {
-            errorMsg = 'Serviço não encontrado.';
-          } else if (error.status === 401 || error.status === 403) {
-            errorMsg = 'Acesso não autorizado.';
-          } else if (error.status >= 500) {
-            errorMsg = 'Erro no servidor. Tente novamente mais tarde.';
-          }
-
-          this.errorMessage.set(errorMsg);
+          this.errorMessage.set('Erro ao carregar cursos.');
           this.isLoading.set(false);
         }
       });
@@ -96,7 +76,11 @@ export class CoursesComponent implements OnInit, OnDestroy {
   }
 
   onAdd() {
-    console.log('Navegando para criação de curso...');
     this.router.navigate(['new'], { relativeTo: this.route });
+  }
+
+  onEdit(course: Course) {
+    // Navega para a rota 'edit/id' de forma relativa à rota atual
+    this.router.navigate(['edit', course.id], { relativeTo: this.route });
   }
 }
