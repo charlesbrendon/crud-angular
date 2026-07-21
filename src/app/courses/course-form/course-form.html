@@ -5,30 +5,81 @@
     <form [formGroup]="form" class="min-width">
       <fieldset [disabled]="isSaving()" style="border: none; padding: 0; margin: 0;">
 
+        <!-- Dados Gerais do Curso -->
         <mat-form-field class="full-width">
           <mat-label>Nome</mat-label>
           <input matInput placeholder="Ex: Angular Avançado" formControlName="name">
-        @if (form.get('name')?.invalid) {
-          <mat-error>{{ getErrorMessage('name') }}</mat-error>
+          @if (form.get('name')?.invalid) {
+            <mat-error>{{ getErrorMessage('name') }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field class="full-width">
           <mat-label>Categoria</mat-label>
           <mat-select formControlName="category">
-            <mat-option value="front-end">Front-end</mat-option>
-            <mat-option value="back-end">Back-end</mat-option>
+            <mat-option value="Front-end">Front-end</mat-option>
+            <mat-option value="Back-end">Back-end</mat-option>
           </mat-select>
-        @if (form.get('category')?.invalid) {
-          <mat-error>{{ getErrorMessage('category') }}</mat-error>
+          @if (form.get('category')?.invalid) {
+            <mat-error>{{ getErrorMessage('category') }}</mat-error>
           }
         </mat-form-field>
+
+        <!-- Bloco Dinâmico de Aulas (FormArray) -->
+        <mat-toolbar class="lessons-toolbar">
+          <span>Aulas</span>
+          <button mat-icon-button color="accent" (click)="addLesson()" type="button" aria-label="Adicionar aula">
+            <mat-icon>add</mat-icon>
+          </button>
+        </mat-toolbar>
+
+        <!-- Mensagem de erro caso tente salvar o formulário sem nenhuma aula -->
+        @if (form.get('lessons')?.invalid && form.get('lessons')?.touched) {
+          <mat-error class="form-array-error">Adicione pelo menos uma aula para o curso.</mat-error>
+        }
+
+        <table style="width: 100%" formArrayName="lessons">
+          @for (lessonGroup of lessonsFormArray.controls; track lessonGroup; let i = $index) {
+            <tr [formGroupName]="i">
+
+              <!-- Input Nome da Aula -->
+              <td style="width: 65%;">
+                <mat-form-field class="full-width">
+                  <mat-label>Nome da Aula</mat-label>
+                  <input matInput placeholder="Ex: Introdução ao Módulo" formControlName="name">
+                  @if (lessonsFormArray.get(i + '.name')?.invalid) {
+                    <mat-error>Nome inválido (mínimo 5 caracteres)</mat-error>
+                  }
+                </mat-form-field>
+              </td>
+
+              <!-- Input URL / ID do YouTube -->
+              <td style="width: 30%;">
+                <mat-form-field class="full-width">
+                  <mat-label>URL/ID do YouTube</mat-label>
+                  <input matInput placeholder="Ex: watch?v=123" formControlName="youtubeUrl">
+                  @if (lessonsFormArray.get(i + '.youtubeUrl')?.invalid) {
+                    <mat-error>URL/ID inválido</mat-error>
+                  }
+                </mat-form-field>
+              </td>
+
+              <!-- Botão Remover Aula -->
+              <td style="width: 5%; text-align: center;">
+                <button mat-icon-button color="warn" (click)="removeLesson(i)" type="button" aria-label="Remover aula">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+
+            </tr>
+          }
+        </table>
 
       </fieldset>
     </form>
   </mat-card-content>
 
-<mat-card-actions class="actions-column">
+  <mat-card-actions class="actions-column">
     <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="isSaving()">
       Salvar
     </button>

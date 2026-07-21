@@ -89,7 +89,9 @@ export class CoursesComponent implements OnInit, OnDestroy {
 
   onEdit(course: Course) {
     // Navega para a rota 'edit/id' de forma relativa à rota atual
-    this.router.navigate(['edit', course.id], { relativeTo: this.route });
+   if (course._id) {
+      this.router.navigate(['edit', course._id], { relativeTo: this.route });
+    }
   }
 
   onDelete(course: Course) {
@@ -101,20 +103,14 @@ export class CoursesComponent implements OnInit, OnDestroy {
     // Escuta a resposta do usuário após fechar o modal
     dialogRef.afterClosed().subscribe((result: boolean) => {
       // Se o usuário clicou em "Sim" (true), faz a deleção no backend
-      if (result) {
-        this.coursesService.remove(course.id).subscribe({
-          next: () => {
-            this.loadCourses(); // Recarrega a listagem
-            this.snackBar.open('Curso removido com sucesso!', 'X', {
-              duration: 5000,
-              verticalPosition: 'top',
-              horizontalPosition: 'center'
-            });
-          },
-          error: () => {
-            this.snackBar.open('Erro ao tentar remover curso.', 'X', { duration: 5000 });
-          }
-        });
+      if (course._id) {
+      this.coursesService.remove(course._id).subscribe({
+        next: () => {
+          this.loadCourses(); // 👈 Corrigido de this.refresh() para this.loadCourses();
+          this.snackBar.open('Curso removido com sucesso!', '', { duration: 5000 });
+        },
+        error: () => this.snackBar.open('Erro ao remover curso.', '', { duration: 5000 })
+      });
       }
     });
   }

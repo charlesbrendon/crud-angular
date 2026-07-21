@@ -1,17 +1,19 @@
-import { Component, inject, signal, OnInit } from '@angular/core'; // 1. Adicione o OnInit
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, signal, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Location, CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ActivatedRoute } from '@angular/router'; // 2. Importe o ActivatedRoute
+import { ActivatedRoute } from '@angular/router';
 
 import { CoursesService } from '../services/courses.service';
+import { Lesson } from '../model/lesson';
 import { Course } from '../model/course';
 
 @Component({
@@ -27,23 +29,22 @@ import { Course } from '../model/course';
     MatButtonModule,
     MatSelectModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatIconModule,
   ],
   templateUrl: './course-form.html',
-  styleUrl: './course-form.scss'
+  styleUrl: './course-form.scss',
 })
-export class CourseForm implements OnInit { // 3. Implemente o OnInit
-
+export class CourseForm implements OnInit {
   private formBuilder = inject(FormBuilder);
   private coursesService = inject(CoursesService);
   private snackBar = inject(MatSnackBar);
   private location = inject(Location);
-  private route = inject(ActivatedRoute); // 4. Injete a rota ativa
+  private route = inject(ActivatedRoute);
 
-  form!: FormGroup; // Mudança para inicialização tardia com "!"
+  form!: FormGroup;
   isSaving = signal<boolean>(false);
 
-  // Retorna a mensagem de erro apropriada para cada campo do formulário
   getErrorMessage(fieldName: string): string {
     const field = this.form.get(fieldName);
 
@@ -52,7 +53,6 @@ export class CourseForm implements OnInit { // 3. Implemente o OnInit
     }
 
     if (field?.hasError('minlength')) {
-      // Busca o tamanho mínimo exigido dinamicamente das configurações do validador
       const requiredLength = field.errors ? field.errors['minlength']['requiredLength'] : 5;
       return `Tamanho mínimo precisa ser de ${requiredLength} caracteres.`;
     }
@@ -66,28 +66,83 @@ export class CourseForm implements OnInit { // 3. Implemente o OnInit
   }
 
   ngOnInit(): void {
-    // 5. Captura o objeto "course" carregado pelo Resolver de Rotas
     const course: Course = this.route.snapshot.data['course'];
 
-    // 6. Constrói o formulário inicializando com os dados existentes (caso seja edição)
+    // 1. Inicializa o formulário contendo o FormArray de lessons
     this.form = this.formBuilder.group({
-      id: [course?.id || ''], // 👈 MUITO IMPORTANTE: O ID fica mapeado aqui (invisível na tela)
-      name: [course?.name || '', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
-      category: [course?.category || '', [Validators.required]]
+      _id: [course?._id || null], // 👈 Atualizado de 'id' para '_id' para bater com o DTO
+      name: [
+        course?.name || '',
+        [Validators.required, Validators.minLength(5), Validators.maxLength(100)],
+      ],
+      category: [course?.category || '', [Validators.required]],
+      lessons: this.formBuilder.array([], Validators.required), // 👈 Inicializa o array vazio
     });
+
+    // 2. Se o curso já tiver aulas (Edição), popula o FormArray
+    if (course && course.lessons) {
+      course.lessons.forEach((lesson) =>
+        this.lessonsFormArray.push(this.createLessonFormGroup(lesson)),
+      );
+    } else {
+      // Opcional: Se for um curso novo, já inicia com pelo menos uma linha de aula em branco
+      this.addLesson();
+    }
+  }
+
+  // 3. Getter para facilitar o acesso ao FormArray no HTML e TS
+  get lessonsFormArray(): FormArray {
+    return this.form.get('lessons') as FormArray;
+  }
+
+  // 4. Método auxiliar para criar o grupo de campos de uma Lesson
+  private createLessonFormGroup(
+    lesson: Lesson = { id: null, name: '', youtubeUrl: '' },
+  ): FormGroup {
+    return this.formBuilder.group({
+      id: [lesson.id],
+      name: [
+        lesson.name,
+        [Validators.required, Validators.minLength(5), Validators.maxLength(100)],
+      ],
+      youtubeUrl: [
+        lesson.youtubeUrl,
+        [Validators.required, Validators.minLength(10), Validators.maxLength(250)],
+      ], // 👈 Atualizado para 250
+    });
+  }
+
+  // 5. Métodos de ação para a tela adicionar/remover aulas
+  addLesson(): void {
+    this.lessonsFormArray.push(this.createLessonFormGroup());
+  }
+
+  removeLesson(index: number): void {
+    this.lessonsFormArray.removeAt(index);
   }
 
   onSubmit() {
     if (this.form.valid) {
       this.isSaving.set(true);
-      this.coursesService.save(this.form.value)
-        .subscribe({
-          next: (result) => {
-            this.snackBar.open('Curso salvo com sucesso!', '', { duration: 5000 });
-            this.onCancel();
-          },
-          error: () => this.onError()
-        });
+
+      // Obtém os valores do formulário
+      const rawValue = this.form.value;
+
+      // Se _id for null ou vazio, não envia o campo _id na criação
+      const courseData: Partial<Course> = {
+        ...(rawValue._id ? { _id: rawValue._id } : {}),
+        name: rawValue.name,
+        category: rawValue.category,
+        lessons: rawValue.lessons,
+      };
+
+      this.coursesService.save(courseData).subscribe({
+        next: () => {
+          this.snackBar.open('Curso salvo com sucesso!', '', { duration: 5000 });
+          this.onCancel();
+        },
+        error: () => this.onError(),
+      });
     }
   }
 

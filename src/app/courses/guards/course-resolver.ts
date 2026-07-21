@@ -8,10 +8,10 @@ export const courseResolver: ResolveFn<Course> = (route, state) => {
   const service = inject(CoursesService);
 
   // Se a rota tiver o parâmetro "id", busca do banco de dados
-  if (route.params && route.params['id']) {
-    return service.loadById(route.params['id']);
+ if (route.params && route.params['id']) {
+    return inject(CoursesService).loadById(Number(route.params['id']));
   }
 
   // Se for uma rota de novo curso (sem id), retorna uma estrutura limpa
-  return of({ id: '', name: '', category: '' });
+  return of({ _id: null, name: '', category: '', lessons: [] });
 };
