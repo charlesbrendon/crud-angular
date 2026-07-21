@@ -15,6 +15,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CoursesService } from '../services/courses.service';
 import { Lesson } from '../model/lesson';
 import { Course } from '../model/course';
+import { FormUtilsService } from '../../shared/form/form-utils.service';
 
 @Component({
   selector: 'app-course-form',
@@ -42,77 +43,44 @@ export class CourseForm implements OnInit {
   private location = inject(Location);
   private route = inject(ActivatedRoute);
 
+  // Injetando a classe utilitária pública para usar direto no HTML
+  public formUtils = inject(FormUtilsService);
+
   form!: FormGroup;
   isSaving = signal<boolean>(false);
 
-  getErrorMessage(fieldName: string): string {
-    const field = this.form.get(fieldName);
-
-    if (field?.hasError('required')) {
-      return 'Campo obrigatório';
-    }
-
-    if (field?.hasError('minlength')) {
-      const requiredLength = field.errors ? field.errors['minlength']['requiredLength'] : 5;
-      return `Tamanho mínimo precisa ser de ${requiredLength} caracteres.`;
-    }
-
-    if (field?.hasError('maxlength')) {
-      const requiredLength = field.errors ? field.errors['maxlength']['requiredLength'] : 100;
-      return `Tamanho máximo excedido de ${requiredLength} caracteres.`;
-    }
-
-    return 'Campo inválido';
-  }
-
   ngOnInit(): void {
     const course: Course = this.route.snapshot.data['course'];
-
-    // 1. Inicializa o formulário contendo o FormArray de lessons
     this.form = this.formBuilder.group({
-      _id: [course?._id || null], // 👈 Atualizado de 'id' para '_id' para bater com o DTO
-      name: [
-        course?.name || '',
-        [Validators.required, Validators.minLength(5), Validators.maxLength(100)],
-      ],
-      category: [course?.category || '', [Validators.required]],
-      lessons: this.formBuilder.array([], Validators.required), // 👈 Inicializa o array vazio
+      _id: [course._id],
+      name: [course.name, [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+      category: [course.category, [Validators.required]],
+      lessons: this.formBuilder.array(this.retrieveLessons(course), Validators.required)
     });
-
-    // 2. Se o curso já tiver aulas (Edição), popula o FormArray
-    if (course && course.lessons) {
-      course.lessons.forEach((lesson) =>
-        this.lessonsFormArray.push(this.createLessonFormGroup(lesson)),
-      );
-    } else {
-      // Opcional: Se for um curso novo, já inicia com pelo menos uma linha de aula em branco
-      this.addLesson();
-    }
   }
 
-  // 3. Getter para facilitar o acesso ao FormArray no HTML e TS
+  private retrieveLessons(course: Course): FormGroup[] {
+    const lessons: FormGroup[] = [];
+    if (course?.lessons?.length) {
+      course.lessons.forEach(lesson => lessons.push(this.createLessonFormGroup(lesson)));
+    } else {
+      lessons.push(this.createLessonFormGroup());
+    }
+    return lessons;
+  }
+
+  private createLessonFormGroup(lesson: Lesson = { id: null, name: '', youtubeUrl: '' }): FormGroup {
+    return this.formBuilder.group({
+      id: [lesson.id],
+      name: [lesson.name, [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+      youtubeUrl: [lesson.youtubeUrl, [Validators.required, Validators.minLength(10), Validators.maxLength(250)]]
+    });
+  }
+
   get lessonsFormArray(): FormArray {
     return this.form.get('lessons') as FormArray;
   }
 
-  // 4. Método auxiliar para criar o grupo de campos de uma Lesson
-  private createLessonFormGroup(
-    lesson: Lesson = { id: null, name: '', youtubeUrl: '' },
-  ): FormGroup {
-    return this.formBuilder.group({
-      id: [lesson.id],
-      name: [
-        lesson.name,
-        [Validators.required, Validators.minLength(5), Validators.maxLength(100)],
-      ],
-      youtubeUrl: [
-        lesson.youtubeUrl,
-        [Validators.required, Validators.minLength(10), Validators.maxLength(250)],
-      ], // 👈 Atualizado para 250
-    });
-  }
-
-  // 5. Métodos de ação para a tela adicionar/remover aulas
   addLesson(): void {
     this.lessonsFormArray.push(this.createLessonFormGroup());
   }
@@ -121,19 +89,16 @@ export class CourseForm implements OnInit {
     this.lessonsFormArray.removeAt(index);
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.form.valid) {
       this.isSaving.set(true);
-
-      // Obtém os valores do formulário
       const rawValue = this.form.value;
 
-      // Se _id for null ou vazio, não envia o campo _id na criação
       const courseData: Partial<Course> = {
         ...(rawValue._id ? { _id: rawValue._id } : {}),
         name: rawValue.name,
         category: rawValue.category,
-        lessons: rawValue.lessons,
+        lessons: rawValue.lessons || []
       };
 
       this.coursesService.save(courseData).subscribe({
@@ -141,17 +106,18 @@ export class CourseForm implements OnInit {
           this.snackBar.open('Curso salvo com sucesso!', '', { duration: 5000 });
           this.onCancel();
         },
-        error: () => this.onError(),
+        error: () => {
+          this.isSaving.set(false);
+          this.snackBar.open('Erro ao salvar curso.', '', { duration: 5000 });
+        }
       });
+    } else {
+      // 👈 Se o formulário for inválido no clique do "Salvar", marca todos os campos para exibir os erros em vermelho!
+      this.formUtils.validateAllFormFields(this.form);
     }
   }
 
-  onCancel() {
+  onCancel(): void {
     this.location.back();
-  }
-
-  private onError() {
-    this.isSaving.set(false);
-    this.snackBar.open('Erro ao salvar curso.', '', { duration: 5000 });
   }
 }
